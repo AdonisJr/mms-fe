@@ -1,6 +1,6 @@
 <template>
     <section class="p-4 h-[70%]">
-        <h2 class="text-2xl font-bold mb-4">USERS LIST</h2>
+        <h2 class="text-2xl font-bold mb-4">INVENTORY LIST</h2>
 
         <!-- Loading Spinner -->
         <Loading v-if="isLoading" />

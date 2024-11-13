@@ -7,6 +7,7 @@ import { useUserStore } from "./components/stores/userStore";
 import Users from "./components/views/Users.vue";
 import Tasks from "./components/views/Tasks.vue";
 import Maintenance from "./components/views/Maintenance.vue";
+import Inventory from "./components/views/Inventory.vue";
 
 const routes = [
     {
