@@ -4,7 +4,7 @@
             class="hover:cursor-pointer text-slate-500 hover:text-slate-700 duration-200"
             @click="sidePanelStore.toggleSidePanel();" />
         <div>
-            <p>User</p>
+            <p @click="userStore.logout">Logout</p>
         </div>
     </nav>
 </template>
@@ -13,7 +13,9 @@
 import { computed, ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useSidePanelStore } from '../stores/sidePanelStore';
+import { useUserStore } from '../stores/userStore';
 
+const userStore = useUserStore();
 const sidePanelStore = useSidePanelStore();
 const isSidePanelOpen = computed(() => sidePanelStore.isSidePanelOpen)
 

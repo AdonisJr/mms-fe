@@ -77,11 +77,11 @@ const login = async () => {
 
     } catch (error) {
         console.log(error)
-        // toast.error(error.response.data.message)
+        toast.error(error.response.data.message)
     } finally {
         isLoading.value = false;
     }
-    toast.success('wewew')
+    console.log(app_url)
 }
 
 onMounted(()=>{
