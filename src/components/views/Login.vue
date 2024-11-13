@@ -66,7 +66,7 @@ const login = async () => {
     try {
         isLoading.value = true;
         // const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, {
-        const response = await axios.post(`http://192.168.1.6:8000/api/login`, credentials.value, {
+        const response = await axios.post(`${app_url}/login`, credentials.value, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
