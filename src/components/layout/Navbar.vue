@@ -4,9 +4,12 @@
             class="hover:cursor-pointer text-slate-500 hover:text-slate-700 duration-200"
             @click="sidePanelStore.toggleSidePanel();" />
         <div>
-            <p @click="userStore.logout">Logout</p>
+            <p @click="isConfirmVisible = true">Logout</p>
+            <!-- <Confirm message="Are you sure you want to logout?" @confirmed="logout"></Confirm> -->
         </div>
     </nav>
+    <Confirm v-if="isConfirmVisible" message="Are you sure you want to logout?" @confirm="logout"
+        @cancel="isConfirmVisible = false" />
 </template>
 
 <script setup>
@@ -14,10 +17,24 @@ import { computed, ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useSidePanelStore } from '../stores/sidePanelStore';
 import { useUserStore } from '../stores/userStore';
+import { useRouter } from 'vue-router';
+import Confirm from '../modal/Confirm.vue';
 
+const toast = useToast();
+const router = useRouter();
 const userStore = useUserStore();
 const sidePanelStore = useSidePanelStore();
 const isSidePanelOpen = computed(() => sidePanelStore.isSidePanelOpen)
+const isConfirmVisible = ref(false);
+
+const logout = () => {
+    userStore.logout();
+    isConfirmVisible.value = false;
+    toast.success('Successfully logout')
+    setTimeout(() => {
+        router.push({ path: '/login' })
+    }, 1000)
+};
 
 watch(isSidePanelOpen, (newVal) => {
     console.log(newVal)

@@ -34,7 +34,9 @@ import axios from 'axios';
 import { useToast } from 'vue-toastification';
 import Loading from '../Loading.vue';
 import { useUserStore } from '../stores/userStore';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const userStore = useUserStore();
 const toast = useToast();
 
@@ -72,20 +74,19 @@ const login = async () => {
                 'Accept': 'application/json',
             }
         })
-        console.log(response)
+        if(response.data.user.type !== 'general_service') return toast.error('Error, only admin are allowed to login')
         userStore.setUser(response.data.user, response.data.token)
-
+        router.push({path: '/admin'})
     } catch (error) {
         console.log(error)
         toast.error(error.response.data.message)
     } finally {
         isLoading.value = false;
     }
-    console.log(app_url)
 }
 
 onMounted(()=>{
     console.log(userStore.isAuthenticated)   
-})
+});
 
 </script>

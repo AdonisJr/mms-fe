@@ -83,9 +83,8 @@ export const insertUser = async (data) => {
         // console.log('response data: ', response.data)
         return response.data;
     } catch (error) {
-
-        console.log('apiServices/insertAvailableServices : ', error)
-        throw new Error('Failed to insert available services.')
+        console.log(error)
+        throw new Error('Failed to insert user.')
     }
 }
 
@@ -106,8 +105,8 @@ export const deleteUser = async (id) => {
         console.log('response data: ', response.data)
         return response.data;
     } catch (error) {
-        console.log('apiServices/updateAvailableServices : ', error)
-        throw new Error('Failed to update available services.')
+        console.log('apiServices/deleteUser : ', error)
+        throw new Error('Failed to delete user.')
     }
 }
 
@@ -116,7 +115,7 @@ export const deleteUser = async (id) => {
 export const fetchRequestedServices = async () => {
     try {
         const response = await apiClient.get(`/service-requests`)
-        // console.log('response data: ', response.data)
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.log('apiServices/fetchRequestedServices : ', error.response.data.message)
@@ -238,7 +237,7 @@ export const schedulePreventiveMaintenance = async (payload) => {
         console.log('response data: ', response.data)
         return response.data;
     } catch (error) {
-        console.log('apiServices/schedulePreventiveMaintenance : ', error.response.data.message)
+        console.log(error)
         throw new Error('Failed to insert preventive maintenance')
     }
 }
