@@ -219,7 +219,7 @@
             </div>
         </div>
     </Modal>
-    <Modal v-if="isShowReportsModal && reports.length !== 0">
+    <Modal v-if="isShowReportsModal && reports">
         <div class="relative bg-white rounded-md z-30 p-4 w-5/6 h-5/6 border-2 border-slate-300">
 
             <p class="text-xl font-bold">Submitted Report:</p>
@@ -249,7 +249,7 @@
                         <th class="p-3 font-semibold text-sm">Reported Date</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="filteredReports.length !== 0">
                     <tr v-for="(data, index) in filteredReports" :key="index"
                         :class="{ 'bg-gray-50': index % 2 === 0, 'bg-white': index % 2 !== 0 }"
                         class="hover:bg-slate-100 border-b border-gray-200">
@@ -261,6 +261,11 @@
                         <td class="p-3 text-gray-700">{{ data?.condition }}</td>
                         <td class="p-3 text-gray-700">{{ data?.other_info }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data?.created_at) }}</td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
+                    <tr class="text-center">
+                        No Data
                     </tr>
                 </tbody>
             </table>
@@ -324,7 +329,6 @@ const toggleSeeMore = (taskIndex) => {
 };
 
 const filteredReports = computed(() => reports.value)
-
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10); // Adjust as needed for items per page
@@ -468,6 +472,10 @@ watch(() => selectedPreventive.value, (newVal) => {
     if (newVal !== '' || newVal) {
         getReports();
     }
+})
+
+watch(() => reports.value, (newVal) => {
+    console.log(newVal)
 })
 
 onMounted(() => {
