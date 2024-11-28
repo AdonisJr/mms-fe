@@ -4,7 +4,7 @@
             class="hover:cursor-pointer text-slate-500 hover:text-slate-700 duration-200"
             @click="sidePanelStore.toggleSidePanel();" />
         <div>
-            <p @click="isConfirmVisible = true">Logout</p>
+            <p @click="isConfirmVisible = true" class="text-red-700 font-bold cursor-pointer hover:text-red-500 duration-200">Logout</p>
             <!-- <Confirm message="Are you sure you want to logout?" @confirmed="logout"></Confirm> -->
         </div>
     </nav>
