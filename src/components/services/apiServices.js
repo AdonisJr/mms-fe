@@ -276,6 +276,17 @@ export const fetchMyPreventiveMaintenanceTasks = async () => {
     }
 }
 
+export const fetchReportsByPreventiveId = async (id) => {
+    try {
+        const response = await apiClient.get(`/getReportsByPreventiveId/${id}`)
+        console.log('response data: ', response.data)
+        return response.data;
+    } catch (error) {
+        console.log('apiServices/fetchReportsByPreventiveId : ', error.response.data.message)
+        throw new Error('Failed to fetch all fetchReportsByPreventiveId')
+    }
+}
+
 // Inventory
 
 export const insertInventory = async (payload) => {

@@ -10,7 +10,7 @@
                     <option value="utility_worker">Personnel</option>
                 </select> -->
                 <div class="w-32 p-2 bg-blue-500 text-white rounded-md flex items-center gap-1 cursor-pointer hover:bg-blue-700 duration-200"
-                    @click="[isModalVisible = true, selectedUser = '']" title="Add new user">
+                    @click="[isModalVisible = true, selectedTask = '']" title="Add new user">
                     <v-icon name="md-personaddalt1" width="22" height="22" />
                     ADD NEW
                 </div>
@@ -25,12 +25,12 @@
             <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
                 <thead>
                     <tr class="bg-slate-700 text-white text-left">
-                        <th class="p-3 font-semibold text-sm">Task</th>
-                        <th class="p-3 font-semibold text-sm">Department</th>
-                        <th class="p-3 font-semibold text-sm">Task Status</th>
-                        <th class="p-3 font-semibold text-sm">Requested By</th>
-                        <th class="p-3 font-semibold text-sm">Approved By</th>
+                        <th class="p-3 font-semibold text-sm">Name</th>
+                        <th class="p-3 font-semibold text-sm">Description</th>
+                        <th class="p-3 font-semibold text-sm">Date From</th>
+                        <th class="p-3 font-semibold text-sm">Date To</th>
                         <th class="p-3 font-semibold text-sm">Assigned Personnel</th>
+                        <th class="p-3 font-semibold text-sm">Assigned Date</th>
                         <th class="p-3 font-semibold text-sm">Action</th>
                     </tr>
                 </thead>
@@ -42,7 +42,6 @@
                         <td class="p-3 text-gray-700">{{ data.description }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.scheduled_date_from) }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.scheduled_date_to) }}</td>
-                        <td class="p-3 text-gray-700">{{ data.status }}</td>
                         <!-- <td class="p-3 text-gray-700">{{ data.service_request.requested.department }}</td> -->
                         <td class="p-3 text-gray-700">
                             <ul class="list-disc pl-5">
@@ -58,12 +57,20 @@
                                 {{ showAll[index] ? 'See less' : 'See more...' }}
                             </button>
                         </td>
+
+                        <td class="p-3 text-gray-700">{{ formatDate(data.created_at) }}</td>
+
                         <td class="p-3 text-gray-700">
                             <!-- MdEditSharp, RiDeleteBin6Line -->
                             <div class="cursor-pointer text-emerald-500 hover:text-emerald-700 duration-200"
                                 title="Edit User"
                                 @click="[isModalVisible = true, selectedTask = data, selectedUsers = data.users.map(user => user.id)]">
-                                <v-icon name="md-edit-sharp" width="22" height="22" />
+                                <v-icon name="md-edit-sharp" width="22" height="22" />Edit
+                            </div>
+                            <!-- MdImportexport -->
+                            <div class="flex mt-2 cursor-pointer text-blue-500 hover:text-blue-700 duration-200"
+                                title="View Reports" @click="[isShowReportsModal = true, selectedPreventive = data]">
+                                <v-icon name="md-importexport" width="22" height="22" />Reports
                             </div>
                         </td>
                     </tr>
@@ -212,16 +219,65 @@
             </div>
         </div>
     </Modal>
+    <Modal v-if="isShowReportsModal && reports.length !== 0">
+        <div class="relative bg-white rounded-md z-30 p-4 w-5/6 h-5/6 border-2 border-slate-300">
+
+            <p class="text-xl font-bold">Submitted Report:</p>
+            <p class="text-lg absolute top-2 cursor-pointer hover:text-slate-400 duration-200 right-4"
+                @click="[isShowReportsModal = false, selectedPreventive = 'false']">x</p>
+
+
+            <div class="flex justify-between items-end px-5">
+                <p class="text-lg font-normal ps-5">
+                    {{ selectedPreventive.name }} <span class="text-slate-500">{{ selectedPreventive.description
+                        }}</span>
+                </p>
+                <button class="bg-emerald-500 text-white py-1 px-4 rounded-md hover:bg-emerald-600 duration-200"
+                    @click="download">Download</button>
+            </div>
+
+            <table class="min-w-full mt-2 bg-white border border-gray-200 rounded-lg shadow">
+                <thead>
+                    <tr class="bg-slate-700 text-white text-left">
+                        <th class="p-3 font-semibold text-sm">Task</th>
+                        <th class="p-3 font-semibold text-sm">Description</th>
+                        <th class="p-3 font-semibold text-sm">Equipment Name</th>
+                        <th class="p-3 font-semibold text-sm">Model</th>
+                        <th class="p-3 font-semibold text-sm">Health</th>
+                        <th class="p-3 font-semibold text-sm">Condition</th>
+                        <th class="p-3 font-semibold text-sm">Other Information</th>
+                        <th class="p-3 font-semibold text-sm">Reported Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(data, index) in filteredReports" :key="index"
+                        :class="{ 'bg-gray-50': index % 2 === 0, 'bg-white': index % 2 !== 0 }"
+                        class="hover:bg-slate-100 border-b border-gray-200">
+                        <td class="p-3 text-gray-700">{{ data?.preventive_maintenance?.name }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.preventive_maintenance?.description }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.service_request?.equipment[0]?.name }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.service_request?.equipment[0]?.model }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.health }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.condition }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.other_info }}</td>
+                        <td class="p-3 text-gray-700">{{ formatDate(data?.created_at) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </Modal>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, reactive, watch } from 'vue';
-import { fetchAllPreventiveMaintenance, updateTaskStatus, fetchUserByType, fetchRequestedServices, schedulePreventiveMaintenance } from '../services/apiServices';
+import { fetchAllPreventiveMaintenance, updateTaskStatus, fetchUserByType, fetchRequestedServices, schedulePreventiveMaintenance, fetchReportsByPreventiveId } from '../services/apiServices';
 import Loading from '../Loading.vue';
 import { useToast } from 'vue-toastification';
 import { formatDate } from '../utils/convertDate';
 import Modal from '../modal/Modal.vue';
 import { useUserStore } from '../stores/userStore';
+import * as XLSX from 'xlsx';
+
 
 const userStore = useUserStore();
 const users = ref([]);
@@ -240,6 +296,9 @@ const selected = ref('');
 // Reactive object to track 'showAll' state for each list
 const showAll = reactive({});
 const requestedServices = ref([])
+const isShowReportsModal = ref(false);
+const selectedPreventive = ref('')
+const reports = ref([]);
 const payload = ref({
     name: '',
     description: '',
@@ -264,10 +323,12 @@ const toggleSeeMore = (taskIndex) => {
     showAll[taskIndex] = !showAll[taskIndex];
 };
 
+const filteredReports = computed(() => reports.value)
 
 // Pagination state
 const currentPage = ref(1);
-const itemsPerPage = ref(5); // Adjust as needed for items per page
+const itemsPerPage = ref(10); // Adjust as needed for items per page
+// Pagination state
 
 const getUsers = async () => {
     isLoading.value = true;
@@ -295,13 +356,44 @@ const getTasks = async () => {
     }
 };
 
+const getReports = async () => {
+    isLoading.value = true;
+    try {
+        const response = await fetchReportsByPreventiveId(selectedPreventive.value.id);
+        reports.value = response;
+        console.log(response)
+        // toast.success('Data updated.');
+    } catch (error) {
+        console.error(error);
+        toast.error('Failed to load preventive maintenance reports.');
+    } finally {
+        isLoading.value = false;
+    }
+};
+
 
 // submit
 const handleSubmit = async () => {
-    const payloadFinal = {...payload.value, user_ids: selectedUsers.value}
+
+    // name: '',
+    // description: '',
+    // status: 'pending',
+    // scheduled_date_from: '',
+    // scheduled_date_to: '',
+    // created_by: userStore.user.id
+
+
+
+    const payloadFinal = { ...payload.value, user_ids: selectedUsers.value }
     if (selectedTask.value) {
-        toast.success('Edit')
+        toast.success('Successfully updated')
+        isModalVisible.value = false;
     } else {
+        if (payload.value.name === '') return toast.error('Type is required.');
+        if (payload.value.description === '') return toast.error('Description is required.');
+        if (payload.value.scheduled_date_from === '') return toast.error('Please select date from.');
+        if (payload.value.scheduled_date_to === '') return toast.error('Please select date to.');
+        if (selectedUsers.value.length === 0) return toast.error('Please select ateast 1 user.');
         await schedulePreventiveMaintenance(payloadFinal);
         toast.success('Preventive maintenance task created.');
         setTimeout(() => {
@@ -315,7 +407,7 @@ const handleSubmit = async () => {
 const paginatedServices = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
-    return preventiveMaintenance.value.slice(start, end);
+    return preventiveMaintenance.value?.slice(start, end);
 });
 
 // Calculate the total number of pages
@@ -334,11 +426,47 @@ const previousPage = () => {
     }
 };
 
+const formatReports = computed(() =>
+    reports.value.map((report) => ({
+        Task: report.preventive_maintenance?.name || 'N/A',
+        Description: report.preventive_maintenance?.description || 'N/A',
+        EquipmentName: report.service_request?.equipment[0]?.name || 'N/A',
+        Model: report.service_request?.equipment[0]?.model || 'N/A',
+        Health: report.health || 'N/A',
+        Condition: report.condition || 'N/A',
+        OtherInformation: report.other_info || 'N/A',
+        ReportedDate: formatDate(report.created_at),
+    }))
+);
+
+const download = () => {
+    // Log the formatted reports for debugging
+    console.log(formatReports.value);
+
+    // Step 1: Prepare the worksheet from the formatted reports
+    const worksheet = XLSX.utils.json_to_sheet(formatReports.value);
+
+    // Step 2: Create a new workbook and append the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reports');
+
+    // Step 3: Write the workbook to a file
+    XLSX.writeFile(workbook, 'report.xlsx');
+};
+
+
 watch(selectAll, (newVal) => {
     if (newVal) {
         selectedUsers.value = users.value.map(user => user.id)
     } else {
         selectedUsers.value = [];
+    }
+})
+
+watch(() => selectedPreventive.value, (newVal) => {
+    // reports.value = newVal;
+    if (newVal !== '' || newVal) {
+        getReports();
     }
 })
 
