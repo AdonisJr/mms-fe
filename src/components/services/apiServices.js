@@ -230,6 +230,16 @@ export const uploadProof = async (id, uri) => {
 
 // Preventive maintenance
 
+export const updatePreventiveStatus = async (payload) => {
+    try {
+        const response = await apiClient.put(`/updatePreventiveStatus/${payload.id}`, payload)
+        console.log('response data: ', response.data)
+        return response.data;
+    } catch (error) {
+        console.log('apiServices/updateTask : ', error.response.data.message)
+        throw new Error('Failed to to update task')
+    }
+}
 
 export const schedulePreventiveMaintenance = async (payload) => {
     try {

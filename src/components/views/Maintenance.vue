@@ -29,6 +29,7 @@
                         <th class="p-3 font-semibold text-sm">Description</th>
                         <th class="p-3 font-semibold text-sm">Date From</th>
                         <th class="p-3 font-semibold text-sm">Date To</th>
+                        <th class="p-3 font-semibold text-sm">Status</th>
                         <th class="p-3 font-semibold text-sm">Assigned Personnel</th>
                         <th class="p-3 font-semibold text-sm">Assigned Date</th>
                         <th class="p-3 font-semibold text-sm">Action</th>
@@ -42,6 +43,7 @@
                         <td class="p-3 text-gray-700">{{ data.description }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.scheduled_date_from) }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.scheduled_date_to) }}</td>
+                        <td class="p-3 text-gray-700">{{ data.status }}</td>
                         <!-- <td class="p-3 text-gray-700">{{ data.service_request.requested.department }}</td> -->
                         <td class="p-3 text-gray-700">
                             <ul class="list-disc pl-5">
@@ -62,10 +64,17 @@
 
                         <td class="p-3 text-gray-700">
                             <!-- MdEditSharp, RiDeleteBin6Line -->
-                            <div class="cursor-pointer text-emerald-500 hover:text-emerald-700 duration-200"
+                            <!-- <div class="cursor-pointer text-emerald-500 hover:text-emerald-700 duration-200"
                                 title="Edit User"
                                 @click="[isModalVisible = true, selectedTask = data, selectedUsers = data.users.map(user => user.id)]">
                                 <v-icon name="md-edit-sharp" width="22" height="22" />Edit
+                            </div> -->
+                            <!-- IoCheckmarkDoneSharp, BiFileImage -->
+                            <div class="flex gap-1 py-1 bg-emerald-500 p-1 cursor-pointer hover:bg-emerald-700 duration-200 rounded-sm text-white"
+                                @click="updateStatus(data, 'completed')"
+                                v-if="data.status !== 'completed'">
+                                <v-icon name="io-checkmark-done-sharp" width="22" height="22" />
+                                Complete
                             </div>
                             <!-- MdImportexport -->
                             <div class="flex mt-2 cursor-pointer text-blue-500 hover:text-blue-700 duration-200"
@@ -115,8 +124,10 @@
             </div>
             <div class="border-2 border-slate-200 p-4 mt-5">
                 <div class="flex items-center gap-2" v-for="(item, index) in users" :key="index">
-                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded my-2" :value="item.id"
-                        v-model="selectedUsers">{{ item.firstname + " " + item.lastname }}
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded my-2" :value="item.id" :disabled="hasPendingTask(item.preventive_maintenances)"
+                        v-model="selectedUsers">
+                        {{ item.firstname + " " +
+                                item.lastname + ` ${hasPendingTask(item.preventive_maintenances) ? '(This user still has pending task)' : ''}`}}
                 </div>
             </div>
             <button class="bg-blue-500 my-5 p-3 text-white hover:bg-blue-600 duration-200"
@@ -255,8 +266,8 @@
                         class="hover:bg-slate-100 border-b border-gray-200">
                         <td class="p-3 text-gray-700">{{ data?.preventive_maintenance?.name }}</td>
                         <td class="p-3 text-gray-700">{{ data?.preventive_maintenance?.description }}</td>
-                        <td class="p-3 text-gray-700">{{ data?.service_request?.equipment[0]?.name }}</td>
-                        <td class="p-3 text-gray-700">{{ data?.service_request?.equipment[0]?.model }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.equipment.name }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.equipment.model }}</td>
                         <td class="p-3 text-gray-700">{{ data?.health }}</td>
                         <td class="p-3 text-gray-700">{{ data?.condition }}</td>
                         <td class="p-3 text-gray-700">{{ data?.other_info }}</td>
@@ -275,7 +286,7 @@
 
 <script setup>
 import { ref, computed, onMounted, reactive, watch } from 'vue';
-import { fetchAllPreventiveMaintenance, updateTaskStatus, fetchUserByType, fetchRequestedServices, schedulePreventiveMaintenance, fetchReportsByPreventiveId } from '../services/apiServices';
+import { fetchAllPreventiveMaintenance, updatePreventiveStatus, fetchUserByType, fetchRequestedServices, schedulePreventiveMaintenance, fetchReportsByPreventiveId, updatePreventiveTaskStatus } from '../services/apiServices';
 import Loading from '../Loading.vue';
 import { useToast } from 'vue-toastification';
 import { formatDate } from '../utils/convertDate';
@@ -313,6 +324,24 @@ const payload = ref({
     created_by: userStore.user.id
 });
 
+// Function to update task status
+const updateStatus = async (data, status) => {
+    const payload = {...data, status: status}
+    isLoading.value = false;
+    try {
+        isLoading.value = true;
+        await updatePreventiveStatus(payload );
+        toast.success(`Task updated, task is now ${status}`)
+        getTasks(); // Refresh tasks
+        getUsers(); // Refresh tasks
+    } catch (error) {
+        console.log(error)
+        toast.error('Failed to update status')
+    } finally {
+        isLoading.value = false;
+    }
+};
+
 // Function to compute visible workers for a specific task
 const visibleWorkers = (taskIndex, workers) => {
     return showAll[taskIndex]
@@ -337,7 +366,9 @@ const itemsPerPage = ref(10); // Adjust as needed for items per page
 const getUsers = async () => {
     isLoading.value = true;
     try {
-        users.value = await fetchUserByType('utility_worker');
+        const response = await fetchUserByType('utility_worker');
+        users.value = response;
+        console.log(response)
         toast.success('Data updated.');
     } catch (error) {
         console.error(error);
@@ -375,6 +406,10 @@ const getReports = async () => {
     }
 };
 
+const hasPendingTask = (tasks) => {
+    return tasks.some(task => task.status === 'pending' || task.status === 'in_progress');
+};
+
 
 // submit
 const handleSubmit = async () => {
@@ -400,6 +435,7 @@ const handleSubmit = async () => {
         if (selectedUsers.value.length === 0) return toast.error('Please select ateast 1 user.');
         await schedulePreventiveMaintenance(payloadFinal);
         toast.success('Preventive maintenance task created.');
+        getUsers();
         setTimeout(() => {
             getTasks();
             isModalVisible.value = false;
@@ -461,11 +497,14 @@ const download = () => {
 
 watch(selectAll, (newVal) => {
     if (newVal) {
-        selectedUsers.value = users.value.map(user => user.id)
+        // Only include users without pending tasks
+        selectedUsers.value = users.value
+            .filter(user => !hasPendingTask(user.preventive_maintenances)) // Exclude users with pending tasks
+            .map(user => user.id); // Map to user IDs
     } else {
         selectedUsers.value = [];
     }
-})
+});
 
 watch(() => selectedPreventive.value, (newVal) => {
     // reports.value = newVal;

@@ -80,7 +80,9 @@
                 <div class="border-2 border-slate-200 p-4 mt-5">
                     <div class="flex items-center gap-2" v-for="(item, index) in users" :key="index">
                         <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded my-2" :value="item.id"
-                            v-model="selectedUsers">{{ item.firstname + " " + item.lastname }}
+                            :disabled="hasPendingTask(item.tasks)" v-model="selectedUsers">
+                            {{ item.firstname + " " +
+                                item.lastname + ` ${hasPendingTask(item.tasks) ? '(This user still has pending task)' : ''}`}}
                     </div>
                 </div>
                 <button class="bg-blue-500 my-5 p-3 text-white hover:bg-blue-600 duration-200"
@@ -193,6 +195,9 @@ const selectAll = ref(false);
 const selectedStatus = ref();
 const inventories = ref([]);
 
+
+// const workerWithPendingTask = computed(() => )
+
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10); // Adjust as needed for items per page
@@ -267,12 +272,26 @@ const handleCancel = () => {
     isConfirmVisible.value = false;
 };
 
+const hasPendingTask = (tasks) => {
+    return tasks.some(task => task.status === 'pending' || task.status === 'in_progress');
+};
+
+// Computed property to filter users with pending or not completed tasks
+const usersWithPendingTasks = computed(() => {
+    return users.value.filter(user => {
+        return user.tasks.some(task => task.status === 'pending');
+    });
+});
+
+
+console.log(usersWithPendingTasks.value)
+
 const getRequestedServices = async () => {
     isLoading.value = true;
     try {
         const response = await fetchRequestedServices();
         requestedServices.value = response;
-        console.log(response)
+        // console.log(response)
         toast.success('Data updated.');
     } catch (error) {
         console.error(error);
@@ -285,7 +304,9 @@ const getRequestedServices = async () => {
 const getUsers = async () => {
     isLoading.value = true;
     try {
-        users.value = await fetchUserByType('utility_worker');
+        const response = await fetchUserByType('utility_worker');
+        users.value = response;
+        console.log(response)
         toast.success('Data updated.');
     } catch (error) {
         console.error(error);
@@ -310,11 +331,14 @@ const getInventory = async () => {
 
 watch(selectAll, (newVal) => {
     if (newVal) {
-        selectedUsers.value = users.value.map(user => user.id)
+        // Only include users without pending tasks
+        selectedUsers.value = users.value
+            .filter(user => !hasPendingTask(user.tasks)) // Exclude users with pending tasks
+            .map(user => user.id); // Map to user IDs
     } else {
         selectedUsers.value = [];
     }
-})
+});
 
 watch(selectedStatus, (newVal, oldVal) => {
     console.log(newVal)

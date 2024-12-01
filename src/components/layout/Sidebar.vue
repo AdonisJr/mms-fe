@@ -4,12 +4,12 @@
         isSidePanelOpen ? 'w-64' : 'w-16'
     ]">
         <div :class="[
-            'flex items-center justify-center px-1 py-8 bg-purple-400 text-white'
+            'flex items-center justify-center px-1 py-8 bg-gradient-to-r from-teal-400 to-blue-500 text-white'
             ]">
             <v-icon name="gi-auto-repair" width="50" height="50" color="yellow" />
             <div class="flex flex-col" v-if="isSidePanelOpen">
-                <p class="text-lg">General Services</p>
-                <span class="text-xs font-normal text-yellow-700">Management & Monitoring</span>
+                <p class="text-lg">GSMMS</p>
+                <span class="text-xs font-normal text-slate-200">Management & Monitoring</span>
             </div>
         </div>
         <div :class="['flex flex-col justify-center gap-2 overflow-y-auto text-slate-400 text-sm font-sans',
@@ -51,7 +51,7 @@
                         pageName === 'Inventory' ? 'text-white' : 'text-slate-400']"
                         @click="router.push({path: '/inventory'})">
                 <v-icon name="ri-insert-row-top" width="22" height="22" />
-                <p v-if="isSidePanelOpen">INVENTORY</p>
+                <p v-if="isSidePanelOpen">INSPECTION</p>
             </div>
             
         </div>
