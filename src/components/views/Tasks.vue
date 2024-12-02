@@ -23,13 +23,12 @@
                     <tr v-for="(data, index) in paginatedServices" :key="index"
                         :class="{ 'bg-gray-50': index % 2 === 0, 'bg-white': index % 2 !== 0 }"
                         class="hover:bg-slate-100 border-b border-gray-200">
-                        <td class="p-3 text-gray-700">{{ data.service_request.service.name }}</td>
-                        <td class="p-3 text-gray-700">{{ data.service_request.requested.department }}</td>
-                        <td class="p-3 text-gray-700">{{ data.status === 'in_progress' && data.proof ? 'In Review' : data.status }}</td>
-                        <td class="p-3 text-gray-700">{{ data.service_request.requested?.firstname + " " +
-                            data.service_request.requested?.lastname }}</td>
-                        <td class="p-3 text-gray-700">{{ data.service_request.approver?.firstname + " " +
-                            data.service_request.approver?.lastname }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.service_request?.service?.name }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.service_request?.requested?.department }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.status === 'in_progress' && data?.proof ? 'In Review' : data?.status }}</td>
+                        <td class="p-3 text-gray-700">{{ data?.service_request?.requested?.firstname + " " +
+                            data?.service_request?.requested?.lastname }}</td>
+                        <td class="p-3 text-gray-700">{{ data.service_request.approver ? `${data?.service_request?.approver?.firstname} ${data?.service_request?.approver?.lastname}` : 'Pending'  }}</td>
                         <!-- <td class="p-3 text-gray-700">{{ data.service_request.requested.department }}</td> -->
                         <td class="p-3 text-gray-700">
                             <ul class="list-disc pl-5">
@@ -81,12 +80,10 @@
     </section>
     <!-- image view modal -->
     <Modal v-if="isShowImageModal">
-        <div class="relative bg-white rounded-md z-30 p-4 w-3/6 h-3/6 border-2 border-slate-300">
+        <div class="relative bg-white rounded-md z-30 p-4 w-3/6 h-6/6 border-2 border-slate-300">
             <img :src="`${path}${imgUrl}`" alt="Preview Image" class="w-full h-auto object-cover" />
             <p class="text-lg absolute top-2 cursor-pointer hover:text-slate-400 duration-200 right-4"
                 @click="isShowImageModal = false">x</p>
-
-            {{ path }}{{ imgUrl }}
         </div>
     </Modal>
 </template>
@@ -99,7 +96,7 @@ import { useToast } from 'vue-toastification';
 import { formatDate } from '../utils/convertDate';
 import Modal from '../modal/Modal.vue';
 
-const path = import.meta.env.VITE_IMG_URL;
+const path = import.meta.env.VITE_API_BASE_URL;
 const toast = useToast();
 const isLoading = ref(false);
 const tasks = ref([]);

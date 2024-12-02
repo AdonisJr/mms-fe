@@ -15,6 +15,7 @@
                         <th class="p-3 font-semibold text-sm">Classification</th>
                         <th class="p-3 font-semibold text-sm">Personnel Needed</th>
                         <th class="p-3 font-semibold text-sm">Requested By</th>
+                        <th class="p-3 font-semibold text-sm">Department</th>
                         <th class="p-3 font-semibold text-sm">Expected Start</th>
                         <th class="p-3 font-semibold text-sm">Expected End</th>
                         <th class="p-3 font-semibold text-sm">Status</th>
@@ -31,6 +32,7 @@
                         <td class="p-3 text-gray-700">{{ data.number_of_personnel }}</td>
                         <td class="p-3 text-gray-700">{{ data.requested.firstname + ' ' + data.requested.lastname }}
                         </td>
+                        <td class="p-3 text-gray-700">{{ data?.requested?.department }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.expected_start_date) }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.expected_end_date) }}</td>
                         <td>
@@ -81,8 +83,8 @@
                     <div class="flex items-center gap-2" v-for="(item, index) in users" :key="index">
                         <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded my-2" :value="item.id"
                             :disabled="hasPendingTask(item.tasks)" v-model="selectedUsers">
-                            {{ item.firstname + " " +
-                                item.lastname + ` ${hasPendingTask(item.tasks) ? '(This user still has pending task)' : ''}`}}
+                        {{ item.firstname + " " +
+                            item.lastname + ` ${hasPendingTask(item.tasks) ? '(This user still has pending task)' : ''}` }}
                     </div>
                 </div>
                 <button class="bg-blue-500 my-5 p-3 text-white hover:bg-blue-600 duration-200"
@@ -250,7 +252,9 @@ const handleSubmit = async () => {
         isLoading.value = true;
         await assignTask(selected.value.id, { assigned_to: selectedUsers.value, deadline: payload.value.deadline });
         // if(selectedInventory.value.length !== 0){
-        await updateInventory(inventoryPayload)
+        if (selectedInventory) {
+            await updateInventory(inventoryPayload)
+        }
         toast.success('Task successfully assigned.');
         setTimeout(() => {
             getRequestedServices();
@@ -291,7 +295,7 @@ const getRequestedServices = async () => {
     try {
         const response = await fetchRequestedServices();
         requestedServices.value = response;
-        // console.log(response)
+        console.log(response)
         toast.success('Data updated.');
     } catch (error) {
         console.error(error);

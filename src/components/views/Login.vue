@@ -94,6 +94,8 @@ function generateRandomExpoPushToken() {
 
 const login = async () => {
     isLoading.value = false;
+    
+    console.log(app_url)
     try {
         isLoading.value = true;
         // const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, {
