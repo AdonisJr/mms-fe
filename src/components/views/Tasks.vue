@@ -79,11 +79,11 @@
         </div>
     </section>
     <!-- image view modal -->
-    <Modal v-if="isShowImageModal">
-        <div class="relative bg-white rounded-md z-30 p-4 w-3/6 h-6/6 border-2 border-slate-300">
-            <img :src="`${path}${imgUrl}`" alt="Preview Image" class="w-full h-auto object-cover" />
-            <p class="text-lg absolute top-2 cursor-pointer hover:text-slate-400 duration-200 right-4"
+    <Modal v-if="isShowImageModal" @click="isShowImageModal = false">
+        <div class="relative bg-white rounded-md z-30 p-4 w-3/6 h-5/6 border-2 border-slate-300">
+            <p class="text-lg absolute top-2 cursor-pointer hover:text-slate-400 duration-200 right-4 z-50"
                 @click="isShowImageModal = false">x</p>
+            <img :src="`${path}${imgUrl}`" alt="Preview Image" class="w-full h-full object-cover" />
         </div>
     </Modal>
 </template>
