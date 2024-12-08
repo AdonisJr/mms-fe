@@ -23,7 +23,18 @@ app.use(Toast, {
         toast.clear();
         return toastInstance;
     }
-})
+});
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/public/firebase-messaging-sw.js')
+        .then((registration) => {
+            console.log('Service Worker registered:', registration);
+        })
+        .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+        });
+};
 
 app.use(pinia);
 app.use(router);

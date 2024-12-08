@@ -64,10 +64,13 @@ import { useToast } from 'vue-toastification';
 import Loading from '../Loading.vue';
 import { useUserStore } from '../stores/userStore';
 import { useRouter } from 'vue-router';
+import { messaging, onMessage, getToken } from '../../../firebase';
 
 const router = useRouter();
 const userStore = useUserStore();
 const toast = useToast();
+const notifToken = ref('');
+const vapidKey = import.meta.env.VITE_VAPID_KEY
 
 const app_url = import.meta.env.VITE_API_BASE_URL;
 
@@ -75,8 +78,13 @@ const isLoading = ref(false);
 const credentials = ref({
     email: '',
     password: '',
-    expo_push_token: generateRandomExpoPushToken()
+    expo_push_token: notifToken
 })
+
+const getNotifToken = async () => {
+    const token = await getToken(messaging, { vapidKey });
+    notifToken.value = token;
+}
 
 function generateRandomExpoPushToken() {
     const prefix = 'ExponentPushToken[';
@@ -117,6 +125,7 @@ const login = async () => {
 }
 
 onMounted(() => {
+    getNotifToken();
     console.log(userStore.isAuthenticated)
 });
 

@@ -332,3 +332,14 @@ export const fetchInventory = async (payload) => {
         throw new Error('Failed to fetch inventory')
     }
 }
+
+export const fetchNotifications = async () => {
+    try {
+        const response = await apiClient.get(`/notifications`)
+        // console.log('response data: ', response.data)
+        return response.data;
+    } catch (error) {
+        console.log('apiServices/fetchNotification : ', error.response.data.message)
+        throw new Error('Failed to fetch notification')
+    }
+}   
