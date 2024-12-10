@@ -18,6 +18,7 @@
                         <th class="p-3 font-semibold text-sm">Department</th>
                         <th class="p-3 font-semibold text-sm">Expected Start</th>
                         <th class="p-3 font-semibold text-sm">Expected End</th>
+                        <th class="p-3 font-semibold text-sm">Reason</th>
                         <th class="p-3 font-semibold text-sm">Status</th>
                         <th class="p-3 font-semibold text-sm">Action</th>
                     </tr>
@@ -36,7 +37,9 @@
                         <td class="p-3 text-gray-700">{{ formatDate(data.expected_start_date) }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.expected_end_date) }}</td>
                         <td>
-                            <select v-model="data.status" @change="() => handleStatusChange(data)"
+                            <!-- @change="() => handleStatusChange(data)" -->
+                            <select v-model="data.status" :disabled="data.status !== 'pending'"
+                                @change="[isStatusModalVisible = true, selectedStatusUpdate = data]"
                                 class="border border-gray-300 rounded p-2 w-full">
                                 <option disabled value="">Please select</option>
                                 <option v-for="(option, optIndex) in options" :key="optIndex" :value="option.value">
@@ -44,6 +47,7 @@
                                 </option>
                             </select>
                         </td>
+                        <td class="p-3 text-gray-700">{{ data.reason }}</td>
                         <td :title="data.tasks.length > 0 ? 'Assigned' : 'Assign Task'"
                             :class="['text-center text-blue-500', data.tasks.length > 0 ? 'text-slate-300 cursor-not-allowed' : 'text-blue-500 cursor-pointer']"
                             @click="data.tasks.length > 0 ? '' : [selected = data, isModalVisible = true]">
@@ -168,6 +172,37 @@
             </div>
         </Modal>
 
+        <Modal v-if="isStatusModalVisible">
+            <div class="relative bg-white rounded-md z-30 p-4 w-2/6 border-2 border-slate-300">
+
+                <p class="text-xl text-slate-600 textce pb-2">
+                    Confirmation
+
+                </p>
+                <!-- BiQuestionDiamond -->
+                <div class="flex justify-center">
+                    <v-icon name="bi-question-diamond" width="50" height="50" />
+                </div>
+                <p class="text-center">Are you sure you want to update status to {{ selectedStatusUpdate.status }}?
+                </p>
+                <div class="py-4" v-if="selectedStatusUpdate.status === 'rejected'">
+                    <p>Please provide a reason for rejecting
+                        <input type="text" class="border-2 border-slate-200 w-full p-2 rounded-full" v-model="reason" />
+                    </p>
+                </div>
+                <div class="w-full flex gap-5 justify-center pt-5">
+                    <button class="bg-emerald-500 text-white p-2 rounded-lg px-5 hover:bg-emerald-600 duration-200"
+                        @click="handleStatusChange">Submit</button>
+                    <!-- @click="[isStatusModalVisible = false, selectedStatusUpdate = '', reason = '', getRequestedServices()]" -->
+                    <button class="bg-red-500 text-white p-2 rounded-lg px-5 hover:bg-red-600 duration-200"
+                        @click="handleCancel">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
+        </Modal>
+
     </section>
 
 </template>
@@ -189,14 +224,16 @@ const requestedServices = ref([]);
 const isConfirmVisible = ref(false);
 const isModalVisible = ref(false);
 const selected = ref(null);
-const originalStatus = ref(''); // Temporary variable to store the original status
+const originalData = ref(''); // Temporary variable to store the original status
 const isUsersModalVisible = ref(false);
 const users = ref([]);
 const selectedUsers = ref([]);
 const selectAll = ref(false);
 const selectedStatus = ref();
 const inventories = ref([]);
-
+const isStatusModalVisible = ref(false);
+const selectedStatusUpdate = ref('');
+const reason = ref('');
 
 // const workerWithPendingTask = computed(() => )
 
@@ -216,8 +253,9 @@ const options = ref([
     { label: "Rejected", value: "rejected" },
 ]);
 
-const handleStatusChange = async (data) => {
-    if (data.tasks.length === 0 && data.status === 'approved') {
+const handleStatusChange = async () => {
+    const payload = selectedStatusUpdate.value
+    if (payload.tasks.length === 0 && payload.status === 'approved') {
         toast.error('Please assign task before approving');
         setTimeout(() => {
             getRequestedServices();
@@ -225,19 +263,21 @@ const handleStatusChange = async (data) => {
         return;
     }
 
-    // Confirmation alert
-    const confirmUpdate = window.confirm(`Are you sure you want to update the status to "${data.status}"?`);
-    if (!confirmUpdate) {
-        return; // Exit if the user cancels
-    }
-
     try {
-        await updateRequestedStatus(data.id, data.status);
+        await updateRequestedStatus(payload.id, payload.status, reason.value);
         toast.success('Status Updated');
+        isStatusModalVisible.value = false;
     } catch (error) {
         console.log(error);
     }
 };
+
+const handleCancel = () => {
+    // const oldData = originalData.value.find(data => selectedStatusUpdate.value.id === data.id);
+    isStatusModalVisible.value = false;
+    selectedStatusUpdate.value = '';
+    getRequestedServices();
+}
 
 
 const handleSubmit = async () => {
@@ -268,13 +308,13 @@ const handleSubmit = async () => {
 }
 
 
-const handleCancel = () => {
-    // Revert the status back to the original value
-    if (selected.value) {
-        selected.value.status = originalStatus.value;
-    }
-    isConfirmVisible.value = false;
-};
+// const handleCancel = () => {
+//     // Revert the status back to the original value
+//     if (selected.value) {
+//         selected.value.status = originalStatus.value;
+//     }
+//     isConfirmVisible.value = false;
+// };
 
 const hasPendingTask = (tasks) => {
     return tasks.some(task => task.status === 'pending' || task.status === 'in_progress');

@@ -135,11 +135,11 @@ export const sendRequest = async (payload) => {
 }
 
 
-export const updateRequestedStatus = async (id, status) => {
+export const updateRequestedStatus = async (id, status, reason) => {
     console.log({ id: id })
     console.log({ status: status })
     try {
-        const response = await apiClient.put(`/service-requests/${id}`, { status: status })
+        const response = await apiClient.put(`/service-requests/${id}`, { status: status, reason })
         console.log('response data: ', response.data)
         return response.data;
     } catch (error) {

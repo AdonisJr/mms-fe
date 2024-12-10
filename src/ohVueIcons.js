@@ -1,4 +1,4 @@
 import { addIcons } from 'oh-vue-icons';
-import { HiSolidUserGroup, FaTools, CoSettings, FaTasks, GiAutoRepair, OiThreeBars, MdAssignment, RiInsertRowTop, MdMapshomeworkSharp, MdEditSharp, RiDeleteBin6Line, MdPersonaddalt1, IoCheckmarkDoneSharp, BiFileImage, MdImportexport, IoNotificationsCircleSharp } from 'oh-vue-icons/icons';
+import { HiSolidUserGroup, FaTools, CoSettings, FaTasks, GiAutoRepair, OiThreeBars, MdAssignment, RiInsertRowTop, MdMapshomeworkSharp, MdEditSharp, RiDeleteBin6Line, MdPersonaddalt1, IoCheckmarkDoneSharp, BiFileImage, MdImportexport, IoNotificationsCircleSharp, BiQuestionDiamond } from 'oh-vue-icons/icons';
 
-addIcons(HiSolidUserGroup, FaTools, CoSettings, FaTasks, GiAutoRepair, OiThreeBars, MdAssignment, RiInsertRowTop, MdMapshomeworkSharp, MdEditSharp, RiDeleteBin6Line, MdPersonaddalt1, IoCheckmarkDoneSharp, BiFileImage, MdImportexport, IoNotificationsCircleSharp);
+addIcons(HiSolidUserGroup, FaTools, CoSettings, FaTasks, GiAutoRepair, OiThreeBars, MdAssignment, RiInsertRowTop, MdMapshomeworkSharp, MdEditSharp, RiDeleteBin6Line, MdPersonaddalt1, IoCheckmarkDoneSharp, BiFileImage, MdImportexport, IoNotificationsCircleSharp, BiQuestionDiamond);
