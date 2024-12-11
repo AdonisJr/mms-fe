@@ -257,6 +257,7 @@ const handleStatusChange = async () => {
     const payload = selectedStatusUpdate.value
     if (payload.tasks.length === 0 && payload.status === 'approved') {
         toast.error('Please assign task before approving');
+        isStatusModalVisible.value = false;
         setTimeout(() => {
             getRequestedServices();
         }, 3000);
@@ -293,7 +294,7 @@ const handleSubmit = async () => {
         isLoading.value = true;
         await assignTask(selected.value.id, { assigned_to: selectedUsers.value, deadline: payload.value.deadline });
         // if(selectedInventory.value.length !== 0){
-        if (selectedInventory) {
+        if (selectedInventory.value) {
             await updateInventory(inventoryPayload)
         }
         toast.success('Task successfully assigned.');
