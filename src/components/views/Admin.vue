@@ -36,6 +36,7 @@
                         <td class="p-3 text-gray-700">{{ data?.requested?.department }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.expected_start_date) }}</td>
                         <td class="p-3 text-gray-700">{{ formatDate(data.expected_end_date) }}</td>
+                        <td class="p-3 text-gray-700">{{ data.reason }}</td>
                         <td>
                             <!-- @change="() => handleStatusChange(data)" -->
                             <select v-model="data.status" :disabled="data.status !== 'pending'"
@@ -47,7 +48,6 @@
                                 </option>
                             </select>
                         </td>
-                        <td class="p-3 text-gray-700">{{ data.reason }}</td>
                         <td :title="data.tasks.length > 0 ? 'Assigned' : 'Assign Task'"
                             :class="['text-center text-blue-500', data.tasks.length > 0 ? 'text-slate-300 cursor-not-allowed' : 'text-blue-500 cursor-pointer']"
                             @click="data.tasks.length > 0 ? '' : [selected = data, isModalVisible = true]">
