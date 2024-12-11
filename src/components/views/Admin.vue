@@ -267,6 +267,7 @@ const handleStatusChange = async () => {
         await updateRequestedStatus(payload.id, payload.status, reason.value);
         toast.success('Status Updated');
         isStatusModalVisible.value = false;
+        getRequestedServices();
     } catch (error) {
         console.log(error);
     }
