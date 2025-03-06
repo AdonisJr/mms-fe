@@ -174,7 +174,7 @@
                     <p class="text-2xl">{{ selectedShowComments.service.name }}</p>
                     <p class="text-lg text-slate-500 border-b-2 border-slate-200 pb-5">{{
                         selectedShowComments.description
-                        }}</p>
+                    }}</p>
                     <div class="mt-2">
                         <p class="p-1 text-md">Comments</p>
                         <div class="flex gap-2">
@@ -196,8 +196,12 @@
                             <v-icon v-else name="co-user-female" width="45" height="45" />
                         </div>
                         <div class="bg-slate-100 w-5/6 p-2 rounded-md">
-                            <p class="font-semibold text-slate-500s">{{ item.user.lastname }}, {{ item.user.firstname }}
-                            </p>
+                            <div class="flex flex-row gap-2 items-end">
+                                <p class="font-semibold text-slate-500s">{{ item.user.lastname }}, {{
+                                    item.user.firstname }}
+                                </p>
+                                <span class="text-blue-500 text-xs">{{ timeAgo(item.created_at) }}</span>
+                            </div>
                             <p class="text-slate-700">{{ item.comment }}</p>
                         </div>
                     </div>
@@ -217,7 +221,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import { fetchComments, fetchRequestedServices, updateRequestedStatus, postComment } from "../services/apiServices";
 import { useToast } from "vue-toastification";
 import Loading from "../Loading.vue";
-import { formatDate } from "../utils/convertDate";
+import { formatDate, timeAgo } from "../utils/convertDate";
 import Modal from "../modal/Modal.vue";
 
 const toast = useToast();

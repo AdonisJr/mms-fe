@@ -115,7 +115,7 @@ const login = async () => {
         })
         if (response.data.user.type !== 'general_service') return toast.error('Error, only admin are allowed to login')
         userStore.setUser(response.data.user, response.data.token)
-        router.push({ path: '/admin' })
+        router.push({ path: '/requested-services' })
     } catch (error) {
         console.log(error)
         toast.error(error.response.data.message)
