@@ -343,3 +343,30 @@ export const fetchNotifications = async () => {
         throw new Error('Failed to fetch notification')
     }
 }   
+
+// Comments
+
+export const fetchComments = async (id) => {
+    try {
+        const response = await apiClient.get(`/comments/${id}`)
+        // console.log('response data: ', response.data)
+        return response.data;
+    } catch (error) {
+        console.log('apiServices/fetchComments : ', error.response.data.message)
+        throw new Error('Failed to fetch comments')
+    }
+} 
+
+export const postComment = async (payload) => {
+    
+    const userStore = useUserStore();
+    const data = {...payload, user_id: userStore.user.id}
+    try {
+        const response = await apiClient.post(`/comments`, data)
+        // console.log('response data: ', response.data)
+        return response.data;
+    } catch (error) {
+        console.log('apiServices/postComment : ', error.response.data.message)
+        throw new Error('Failed to post comment')
+    }
+} 

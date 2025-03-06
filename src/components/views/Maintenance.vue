@@ -413,16 +413,6 @@ const hasPendingTask = (tasks) => {
 
 // submit
 const handleSubmit = async () => {
-
-    // name: '',
-    // description: '',
-    // status: 'pending',
-    // scheduled_date_from: '',
-    // scheduled_date_to: '',
-    // created_by: userStore.user.id
-
-
-
     const payloadFinal = { ...payload.value, user_ids: selectedUsers.value }
     if (selectedTask.value) {
         toast.success('Successfully updated')

@@ -8,6 +8,9 @@ import Users from "./components/views/Users.vue";
 import Tasks from "./components/views/Tasks.vue";
 import Maintenance from "./components/views/Maintenance.vue";
 import Inventory from "./components/views/Inventory.vue";
+import Dashboard from "./components/views/Dashboard.vue";
+import Preventive from "./components/views/Preventive.vue";
+import Equipment from "./components/views/Equipment.vue";
 
 const routes = [
     {
@@ -41,8 +44,23 @@ const routes = [
         component: AdminPanelLayout,
         children: [
             {
-                path: '/admin',
-                name: 'Home',
+                path: '/requested-services',
+                name: 'Requested',
+                component: Dashboard // Home 
+            },
+            {
+                path: '/preventive',
+                name: 'Preventive',
+                component: Preventive // Preventive 
+            },
+            {
+                path: '/equipment',
+                name: 'Equipment',
+                component: Equipment // Preventive 
+            },
+            {
+                path: '/requested-servicesssss',
+                name: 'Requesteds',
                 component: Admin // Home 
             },
             {
@@ -81,7 +99,7 @@ router.beforeEach((to, from, next) => {
 
     // If the user is authenticated, redirect to the /admin page
     if (userStore.isAuthenticated && to.path === '/login') {
-        next('/admin'); // Redirect authenticated users to /admin
+        next('/dashboard'); // Redirect authenticated users to /admin
     }
     // If the user is not authenticated and trying to access protected routes
     else if (to.path !== '/login' && !userStore.isAuthenticated) {
